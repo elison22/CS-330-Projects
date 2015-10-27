@@ -1,0 +1,5 @@
+#lang lazy
+
+(define obj
+	(+ 3 4))
+
