@@ -30,7 +30,7 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (define (take-while p l)
   (cond
     [(empty? l) empty];empty case
-    [(p (first l)) (cons (first l) (take-while p (rest l)))];I think this is right? I am not sure.
+    [(p (first l)) (cons (first l) (take-while p (rest l)))]
     [else empty]
     )
   )
