@@ -95,13 +95,12 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 	(list-ref l i))
 
 ;Tests for build-infinite-list
-;I don't know what I'm doing
 (test(lr(bif (λ (n) 2)) 0) 2)
 (test(lr(bif (λ (n) 2)) 1000) 2)
-(test(lr(bif (λ (n) (* n 2))) 5) 10)
 (test(lr(bif (λ (n) (+ n 2))) 1) 3)
 (test(lr(bif (λ (n) (- n 2))) 0) -2)
-(test(lr(bif (λ (n) (+ n 1))) 1000) 1001)
+(test(lr(bif (λ (n) (* n 2))) 5) 10)
+(test(lr(bif (λ (n) (/ n 2))) 1000) 500)
 (test(lr(bif odd?) 1000) #f)
 (test(lr(bif even?) 1000) #t)
 (test(lr(bif (λ (n) (even? (+ 1 n)))) 1000) #f)
@@ -109,7 +108,6 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (define (low-nn num)
 	(tw (λ (x) (< x num)) (bif (λ (x) (+ x 2)))))
 
-;0 2 4 6 8...
 ;--------------------------------------------------------------------------------
 
 ;(prime? n) → boolean?
@@ -120,17 +118,14 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 			[(< n 1) (error "must be positive")]
 			[else (andmap	(λ (x) (not (zero? (% n x)))) (low-nn n))]))
 
-
-; (prime? 1)
-; (prime? 2)
-; (prime? 3)
-; (prime? 4)
-; (prime? 5)
-; (prime? 6)
-; (prime? 7)
-; (prime? 621)
-
-;Tests for prime?
+;Tests for prime
+;Do we have to bullet-proof this like we did with the interpreters? 
+(test (prime? 1) false)
+(test (prime? 2) true)
+(test (prime? 6) false)
+(test (prime? 7) true)
+(test (prime? 44178) false)
+(test (prime? 103423) true)
 ;--------------------------------------------------------------------------------
 
 ;primes : (listof exact-positive-integer?)
@@ -139,7 +134,10 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 	(filter prime? (bif (λ (n) (+ n 1)))))
 
 ;Tests for primes
-
+(test (list-ref primes 0) 2)
+(test (list-ref primes 1) 3)
+(test (list-ref primes 5) 13)
+(test (list-ref primes 15) 53)
 
 ;--------------------------------------------------------------------------------
 
@@ -158,10 +156,19 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (define primes/fast
 	(filter prime?/fast (bif (λ (x) (+ x 1)))))
 
-(prime?/fast 11)
-
 ;Tests for prime?/fast
+;(test (prime?/fast 0) false)
+(test (prime?/fast 1) false)
+(test (prime?/fast 2) true)
+(test (prime?/fast 4) false)
+(test (prime?/fast 11) true)
 
+;Tests for primes/fast
+;do we need to show that this is faster than primes?
+(test (list-ref primes/fast 0) 2)
+(test (list-ref primes/fast 1) 3)
+(test (list-ref primes/fast 25) 101)
+(test (list-ref primes/fast 1500) 12569)
 ;--------------------------------------------------------------------------------
 
 ;Helper function from spec
@@ -180,9 +187,8 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 ;equals (f i j), when (< i rows) (< j cols).
 (define (build-table rows cols f)
   (letrec ([map-vector (λ (x) (build-vector cols (λ (y) (f x y))))])
-    (build-vector rows map-vector)
+    (build-vector rows map-vector))
   )
- )
 
 ;Tests for build-table
 (test (vector-ref (vector-ref (build-table 5 5 (λ (x y) (* x y))) 4) 3) 12)
@@ -205,10 +211,13 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
                                             (max
                                              (vector-ref (vector-ref lcs-table x) (- y 1))
                                              (vector-ref (vector-ref lcs-table (- x 1)) y))
-                                     )))))];funct
+                                     )))))]
     (vector-ref (vector-ref lcs-table (string-length s1)) (string-length s2))
     ))
 
 ;Tests for lcs-length
-(lcs-length "katc" "catk")
+(test (lcs-length "katc" "catk") 2)
+(test (lcs-length "helol" "heol") 4)
+(test (lcs-length "yes" "no") 0)
+(test (lcs-length "artist" "artsy") 4)
 ;--------------------------------------------------------------------------------
