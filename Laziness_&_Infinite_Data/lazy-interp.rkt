@@ -163,12 +163,14 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 ;Tests for prime?/fast
 
 ;--------------------------------------------------------------------------------
-#|
 
 ;Helper function from spec
 (define (build-vector num f)
   (apply vector (build-list num f)))
 
+;Tests for build-vector
+(test (vector-ref (build-vector 1 (λ (x) x)) 0) 0)
+(test (vector-ref (build-vector 3 (λ (x) (* x x))) 2) 4)
 
 ;(build-table rows cols f) → (vectorof (vectorof any/c))
 ;  rows : exact-positive-integer?
@@ -177,24 +179,36 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 ;Lazily constructs a vector such that (vector-ref (vector-ref (build-table rows cols f) i) j)
 ;equals (f i j), when (< i rows) (< j cols).
 (define (build-table rows cols f)
-
+  (letrec ([map-vector (λ (x) (build-vector cols (λ (y) (f x y))))])
+    (build-vector rows map-vector)
   )
+ )
 
 ;Tests for build-table
-
-|#
+(test (vector-ref (vector-ref (build-table 5 5 (λ (x y) (* x y))) 4) 3) 12)
+(test (vector-ref (vector-ref (build-table 1 1 (λ (x y) (+ x y))) 0) 0) 0)
 ;--------------------------------------------------------------------------------
-#|
+
 ;procedure
 ;(lcs-length s1 s2) → exact-nonnegative-integer?
 ;  s1 : string?
 ;  s2 : string?
 ;Computes the length of the longest common subsequence of two strings s1 and s2.
 (define (lcs-length s1 s2)
-
-)
+  (letrec [(lcs-table (build-table (+ 1 (string-length s1));rows
+                                   (+ 1 (string-length s2));cols
+                                   (λ (x y)
+                                     (if(or (= x 0) (= y 0));Fill first col and row with 0s
+                                        0
+                                        (if (char=? (string-ref s1 (- x 1)) (string-ref s2 (- y 1)))
+                                            (+ (vector-ref (vector-ref lcs-table (- x 1)) (- y 1)) 1)
+                                            (max
+                                             (vector-ref (vector-ref lcs-table x) (- y 1))
+                                             (vector-ref (vector-ref lcs-table (- x 1)) y))
+                                     )))))];funct
+    (vector-ref (vector-ref lcs-table (string-length s1)) (string-length s2))
+    ))
 
 ;Tests for lcs-length
-
-|#
+(lcs-length "katc" "catk")
 ;--------------------------------------------------------------------------------
