@@ -30,7 +30,7 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (define (take-while p l)
   (cond
     [(empty? l) empty];empty case
-    [(p (first l)) (cons (first l) (take-while p (rest l)))];I think this is right? I am not sure.
+    [(p (first l)) (cons (first l) (take-while p (rest l)))]
     [else empty]
     )
   )
@@ -116,10 +116,10 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (define (prime? n)
 	(cond	[(= n 1) #f]
 			[(< n 1) (error "must be positive")]
-			[else (andmap	(λ (x) (not (zero? (% n x)))) (low-nn n))]))
+			[else (andmap	(λ (x) (not (zero? (% n x)))) (low-nn n))])
+  )
 
 ;Tests for prime
-;Do we have to bullet-proof this like we did with the interpreters? 
 (test (prime? 1) false)
 (test (prime? 2) true)
 (test (prime? 6) false)
@@ -137,7 +137,7 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (test (list-ref primes 0) 2)
 (test (list-ref primes 1) 3)
 (test (list-ref primes 5) 13)
-(test (list-ref primes 15) 53)
+(test (list-ref primes 100) 547)
 
 ;--------------------------------------------------------------------------------
 
@@ -162,6 +162,8 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (test (prime?/fast 2) true)
 (test (prime?/fast 4) false)
 (test (prime?/fast 11) true)
+(test (prime?/fast 25367) true)
+(test (prime?/fast 25368) false)
 
 ;Tests for primes/fast
 ;do we need to show that this is faster than primes?
@@ -220,4 +222,5 @@ Licensed under the GNU GPL v3 found @ http://www.gnu.org/licenses/gpl-3.0.en.htm
 (test (lcs-length "helol" "heol") 4)
 (test (lcs-length "yes" "no") 0)
 (test (lcs-length "artist" "artsy") 4)
+(test (lcs-length "abcdefghijklmnopqrstuvwxyz" "111abcdefghijklm111nopqrstuvw222xyzaaa") 26)
 ;--------------------------------------------------------------------------------
